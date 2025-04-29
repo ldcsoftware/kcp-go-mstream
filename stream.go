@@ -966,36 +966,12 @@ func (s *UDPStream) recvSyn(data []byte) (n int, err error) {
 		return len(data), nil
 	}
 
-	remotes, err := s.decodeDialInfo(data)
+	_, err = s.decodeDialInfo(data)
 	if err != nil {
 		return len(data), err
 	}
-	if len(remotes) == 0 {
-		return len(data), errSynInfo
-	}
-	tunnels := s.sel.Pick(remotes)
-	if len(tunnels) == 0 || len(tunnels) != len(remotes) {
-		return len(data), errSynInfo
-	}
-	remoteAddrs := make([]*net.UDPAddr, len(remotes))
-	for i, remote := range remotes {
-		remoteAddr, err := net.ResolveUDPAddr("udp", remote)
-		if err != nil {
-			return len(data), err
-		}
-		remoteAddrs[i] = remoteAddr
-	}
 
-	locals := make([]*net.UDPAddr, len(tunnels))
-	for i, tunnel := range tunnels {
-		locals[i] = tunnel.LocalAddr()
-	}
-
-	s.tunnels = tunnels
-	s.locals = locals
-	s.remotes = remoteAddrs
-
-	Logf(INFO, "UDPStream::recvSyn uuid:%v accepted:%v locals:%v remotes:%v", s.uuid, s.accepted, locals, remotes)
+	Logf(INFO, "UDPStream::recvSyn uuid:%v accepted:%v", s.uuid, s.accepted)
 	return len(data), nil
 }
 

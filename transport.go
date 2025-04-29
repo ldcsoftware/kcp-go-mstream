@@ -51,6 +51,30 @@ type TunnelSelector interface {
 	Pick(remotes []string) (tunnels []*UDPTunnel)
 }
 
+type DefaultSelector struct {
+	tunnels []*UDPTunnel
+	rr      int
+}
+
+func NewDefaultSelector() *DefaultSelector {
+	return &DefaultSelector{
+		tunnels: make([]*UDPTunnel, 0),
+	}
+}
+
+func (p *DefaultSelector) Add(tunnel *UDPTunnel) {
+	p.tunnels = append(p.tunnels, tunnel)
+}
+
+func (p *DefaultSelector) Pick(remotes []string) (tunnels []*UDPTunnel) {
+	tunnels = make([]*UDPTunnel, len(remotes))
+	for i := 0; i < len(remotes); i++ {
+		tunnels[i] = p.tunnels[(i+p.rr)%len(p.tunnels)]
+	}
+	p.rr++
+	return
+}
+
 type TransportOption struct {
 	AcceptBacklog   int
 	DialTimeout     time.Duration
@@ -126,6 +150,9 @@ type UDPTransport struct {
 }
 
 func NewUDPTransport(sel TunnelSelector, opt *TransportOption) (t *UDPTransport, err error) {
+	if sel == nil {
+		sel = NewDefaultSelector()
+	}
 	if opt == nil {
 		opt = &TransportOption{}
 	}
@@ -195,7 +222,7 @@ func (t *UDPTransport) NewStream(uuid gouuid.UUID, accepted bool, remotes []stri
 	return stream, err
 }
 
-//interface
+// interface
 func (t *UDPTransport) Open(locals, remotes []string) (stream *UDPStream, err error) {
 	return t.OpenTimeout(locals, remotes, t.DialTimeout)
 }
