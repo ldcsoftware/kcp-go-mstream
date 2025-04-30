@@ -141,27 +141,4 @@ func main() {
 		}
 	}
 
-	// addr, err := net.ResolveUDPAddr("udp", *targetAddr)
-	// if err != nil {
-	// 	fmt.Println("ResolveUDPAddr error:", err)
-	// 	return
-	// }
-
-	// idx := 0
-	// for {
-	// 	tunnel := defaultTunnels[idx]
-	// 	idx = idx % len(defaultTunnels)
-
-	// 	uuid, _ := gouuid.NewV1()
-	// 	buf := make([]byte, 100)
-	// 	copy(buf, uuid[:])
-
-	// 	fmt.Printf("send target uuid:%v remote:%v \n", uuid, addr)
-
-	// 	msg := ipv4.Message{}
-	// 	msg.Buffers = [][]byte{buf}
-	// 	msg.Addr = addr
-
-	// 	time.Sleep(time.Second)
-	// }
 }

@@ -586,8 +586,6 @@ func (s *UDPStream) dial(locals []string, timeout time.Duration) error {
 
 	if s.accepted {
 		return nil
-	} else if len(locals) == 0 {
-		return errDialParam
 	}
 
 	dialBuf, err := s.encodeDialInfo(locals)
